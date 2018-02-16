@@ -126,8 +126,7 @@ handle_call({ping, Index}, _From, #state{actor=Actor, full_membership=FullMember
 
 %% @private
 -spec handle_cast(term(), state_t()) -> {noreply, state_t()}.
-
-handle_call({pong, Index, Sender}=Msg, #state{actor=Actor, reply_function=ReplyFun}=State) ->
+handle_cast({pong, Index, Sender}=Msg, #state{actor=Actor, reply_function=ReplyFun}=State) ->
 
     case Sender of
         Actor ->
