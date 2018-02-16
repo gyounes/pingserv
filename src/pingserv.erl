@@ -122,9 +122,12 @@ handle_call({ping, Index}, _From, #state{actor=Actor, full_membership=FullMember
 
     pingserv_util:send(Msg, ToMembers),
     
-    {reply, ok, State};
+    {reply, ok, State}.
 
-handle_call({pong, Index, Sender}=Msg, _From, #state{actor=Actor, reply_function=ReplyFun}=State) ->
+%% @private
+-spec handle_cast(term(), state_t()) -> {noreply, state_t()}.
+
+handle_call({pong, Index, Sender}=Msg, #state{actor=Actor, reply_function=ReplyFun}=State) ->
 
     case Sender of
         Actor ->
@@ -133,10 +136,8 @@ handle_call({pong, Index, Sender}=Msg, _From, #state{actor=Actor, reply_function
             pingserv_util:send(Msg, Sender)
     end,
     
-    {reply, ok, State}.
+    {noreply, State};
 
-%% @private
--spec handle_cast(term(), state_t()) -> {noreply, state_t()}.
 handle_cast(Msg, State) ->
     lager:warning("Unhandled cast messages: ~p", [Msg]),
     {noreply, State}.
