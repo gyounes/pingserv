@@ -29,6 +29,8 @@
 %% handler callbacks
 -export([ping/1,
          setreply/1,
+         push_metrics/1,
+         get_metrics/0,
          fullmembership/1]).
 
 %% gen_server callbacks
@@ -41,6 +43,7 @@
 
 -record(state, {actor :: node(),
                 full_membership :: [node()],
+                metrics :: term(),
                 reply_function :: fun()}).
 
 -type state_t() :: #state{}.
@@ -64,6 +67,15 @@ ping(Index) ->
 setreply(Node) ->
     gen_server:call(?MODULE, {setreply, Node}, infinity).
 
+%% Push Metrics.
+-spec push_metrics(term()) -> ok.
+push_metrics(Data) ->
+    gen_server:call(?MODULE, {push_metrics, Data}, infinity).
+
+%% Get Metrics.
+-spec get_metrics() -> term().
+get_metrics() ->
+    gen_server:call(?MODULE, get_metrics, infinity).
 
 %%%===================================================================
 %%% API
@@ -113,6 +125,12 @@ handle_call({setreply, Node}, _From, State) ->
     end,
 
     {reply, ok, State#state{reply_function=ReplyFun}};
+
+handle_call({push_metrics, Data}, _From, State) ->
+    {reply, ok, State#state{metrics=Data}};
+
+handle_call(get_metrics, _From, #state{metrics=Metrics}=State) ->
+    {reply, Metrics, State};
 
 handle_call({ping, Index}, _From, #state{actor=Actor, full_membership=FullMembership}=State) ->
 
