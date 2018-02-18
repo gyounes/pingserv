@@ -1,7 +1,7 @@
 pingserv
 =====
 
-An OTP application
+A very simple OTP ping server application.
 
 Build
 -----
