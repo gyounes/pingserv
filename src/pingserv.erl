@@ -92,88 +92,94 @@ start_link() ->
 %% @private
 -spec init(list()) -> {ok, state_t()}.
 init([]) ->
-    %% Seed the process at initialization.
-    rand_compat:seed(erlang:phash2([node()]),
-                     erlang:monotonic_time(),
-                     erlang:unique_integer()),
+  %% Seed the process at initialization.
+  rand_compat:seed(erlang:phash2([node()]),
+    erlang:monotonic_time(),
+    erlang:unique_integer()),
 
-    Actor = node(),
+  Actor = node(),
 
-    {ok, #state{actor=Actor,
-                full_membership=[]}}.
+  {ok, #state{actor=Actor,
+  full_membership=[]}}.
 
 %% @private
 -spec handle_call(term(), {pid(), term()}, state_t()) ->
-    {reply, term(), state_t()}.
+  {reply, term(), state_t()}.
 
 %% @todo Update other actors when this is changed
 handle_call({fullmembership, Nodes}, _From, State) ->
-    Nodes1 = case lists:last(Nodes) of
-        {_, _} ->
-            [Node || {_Name, Node} <- Nodes];
-        _ ->
-            Nodes
-    end,
-    Sorted = lists:usort(Nodes1),
-    lager:info("fullmembership is ~p", [Sorted]),
-    {reply, ok, State#state{full_membership=Sorted}};
+  
+  Nodes1 = case lists:last(Nodes) of
+    {_, _} ->
+      [Node || {_Name, Node} <- Nodes];
+    _ ->
+      Nodes
+  end,
+  Sorted = lists:usort(Nodes1),
+  lager:info("fullmembership is ~p", [Sorted]),
+  
+  {reply, ok, State#state{full_membership=Sorted}};
 
 handle_call({setreply, Node}, _From, State) ->
-    ReplyFun = fun(Index) ->
-      Node ! {setreply, Index},
-      ok
-    end,
+  
+  ReplyFun = fun(Index) ->
+    Node ! {setreply, Index},
+    ok
+  end,
 
-    {reply, ok, State#state{reply_function=ReplyFun}};
+  {reply, ok, State#state{reply_function=ReplyFun}};
 
 handle_call({push_metrics, Data}, _From, State) ->
     {reply, ok, State#state{metrics=Data}};
 
-handle_call(get_metrics, _From, #state{metrics=Metrics}=State) ->
-    {reply, Metrics, State};
+handle_call(get_metrics, _From, #state{metrics=Metrics0}=State) ->
+  
+  Metrics=[X || {_, X} <- Metrics0],
+  
+  {reply, Metrics, State};
 
 handle_call({ping, Index}, _From, #state{actor=Actor, full_membership=FullMembership}=State) ->
 
-    ToMembers = pingserv_util:without_me(FullMembership),
+  ToMembers = pingserv_util:without_me(FullMembership),
 
-    Msg = {pong, Index, Actor},
+  Msg = {pong, Index, Actor},
 
-    pingserv_util:send(Msg, ToMembers),
-    
-    {reply, ok, State}.
+  pingserv_util:send(Msg, ToMembers),
+  
+  {reply, ok, State}.
 
 %% @private
 -spec handle_cast(term(), state_t()) -> {noreply, state_t()}.
 handle_cast({pong, Index, Sender}=Msg, #state{actor=Actor, reply_function=ReplyFun}=State) ->
 
-    case Sender of
-        Actor ->
-            ReplyFun(Index);
-        _ ->
-            pingserv_util:send(Msg, Sender)
-    end,
-    
-    {noreply, State};
+  case Sender of
+      Actor ->
+          ReplyFun(Index);
+      _ ->
+          pingserv_util:send(Msg, Sender)
+  end,
+  
+  {noreply, State};
 
 handle_cast(Msg, State) ->
-    lager:warning("Unhandled cast messages: ~p", [Msg]),
-    {noreply, State}.
+  lager:warning("Unhandled cast messages: ~p", [Msg]),
+  {noreply, State}.
 
 %% @private
 -spec handle_info(term(), state_t()) -> {noreply, state_t()}.
 handle_info(Msg, State) ->
-    lager:warning("Unhandled info messages: ~p", [Msg]),
-    {noreply, State}.
+  lager:warning("Unhandled info messages: ~p", [Msg]),
+  {noreply, State}.
 
 %% @private
 -spec terminate(term(), state_t()) -> term().
 terminate(_Reason, _State) ->
-    ok.
+  ok.
 
 %% @private
 -spec code_change(term() | {down, term()}, state_t(), term()) -> {ok, state_t()}.
 code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
+  {ok, State}.
 
 %%%===================================================================
 %%% Internal functions
