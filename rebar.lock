@@ -4,7 +4,7 @@
  {<<"lager">>,{pkg,<<"lager">>,<<"3.2.4">>},0},
  {<<"partisan">>,
   {git,"https://github.com/gyounes/partisan",
-       {ref,"efda09f556378016c0c1cb4acb80947a0271a733"}},
+       {ref,"132fa4ab6ae36512960338c0f7c69e86b0a3a429"}},
   0},
  {<<"rand_compat">>,{pkg,<<"rand_compat">>,<<"0.0.1">>},0},
  {<<"time_compat">>,{pkg,<<"time_compat">>,<<"0.0.1">>},0},
