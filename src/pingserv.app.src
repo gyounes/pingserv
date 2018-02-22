@@ -9,8 +9,7 @@
     crypto,
     lager,
     time_compat,
-    rand_compat,
-    partisan]
+    rand_compat]
   },
   {env,[]},
   {modules, []},
