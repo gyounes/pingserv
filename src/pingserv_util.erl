@@ -33,7 +33,7 @@
 send(Msg, Peers) when is_list(Peers) ->
     lists:foreach(
         fun(Peer) ->
-            partisan_default_peer_service_manager:forward_message(Peer, pingserv, Msg)
+            partisan_static_peer_service_manager:forward_message(Peer, pingserv, Msg)
         end,
     Peers);
 send(M, Peer) ->
