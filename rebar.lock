@@ -3,6 +3,10 @@
  {<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.9">>},1},
  {<<"lager">>,{pkg,<<"lager">>,<<"3.2.4">>},0},
  {<<"rand_compat">>,{pkg,<<"rand_compat">>,<<"0.0.1">>},0},
+ {<<"partisan">>,
+  {git,"https://github.com/gyounes/partisan",
+       {ref,"132fa4ab6ae36512960338c0f7c69e86b0a3a429"}},
+  0},
  {<<"time_compat">>,{pkg,<<"time_compat">>,<<"0.0.1">>},0}]}.
 [
 {pkg_hash,[
